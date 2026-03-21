@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymBuddy</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>GymBuddy</h1>
+            <p class="subtitle">Your workout, ready in 30 seconds.</p>
+        </header>
+
+        <!-- Step 0: Proactive suggestion -->
+        <section id="suggestion" class="hidden">
+            <div class="suggestion-card">
+                <p class="suggestion-label">Today's suggestion</p>
+                <h2 id="suggestion-focus"></h2>
+                <p id="suggestion-reason" class="suggestion-reason"></p>
+                <div class="suggestion-meta">
+                    <span id="suggestion-duration"></span>
+                    <span id="suggestion-equipment"></span>
+                </div>
+                <button id="suggestion-confirm-btn" class="primary-btn">Let's go</button>
+                <button id="suggestion-adjust-btn" class="secondary-btn">Adjust</button>
+            </div>
+        </section>
+
+        <!-- Step 1: The 3 questions -->
+        <section id="setup-form" class="hidden">
+            <h2>Before you go in —</h2>
+
+            <div class="question">
+                <label>How long do you have?</label>
+                <div class="options" id="duration-options">
+                    <button class="option-btn" data-value="20">20 min</button>
+                    <button class="option-btn" data-value="40">40 min</button>
+                    <button class="option-btn" data-value="60">60 min</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <label>What equipment is available?</label>
+                <div class="options" id="equipment-options">
+                    <button class="option-btn" data-value="no equipment">No equipment</button>
+                    <button class="option-btn" data-value="dumbbells only">Dumbbells</button>
+                    <button class="option-btn" data-value="full gym">Full gym</button>
+                </div>
+            </div>
+
+            <div class="question">
+                <label>How are you feeling?</label>
+                <div class="options" id="energy-options">
+                    <button class="option-btn" data-value="fresh">Fresh</button>
+                    <button class="option-btn" data-value="moderate">Moderate</button>
+                    <button class="option-btn" data-value="tired/sore">Tired / Sore</button>
+                </div>
+            </div>
+
+            <button id="generate-btn" class="primary-btn" disabled>Get My Workout</button>
+        </section>
+
+        <!-- Step 2: Loading -->
+        <section id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p>Building your workout...</p>
+        </section>
+
+        <!-- Step 3: Workout display -->
+        <section id="workout-display" class="hidden">
+            <div id="workout-graphic"></div>
+
+            <div id="workout-header">
+                <h2 id="workout-title"></h2>
+                <div class="workout-meta">
+                    <span id="workout-focus"></span>
+                    <span id="workout-duration"></span>
+                </div>
+                <p id="coach-note" class="coach-note"></p>
+            </div>
+
+            <div id="exercises-list"></div>
+
+            <div class="action-buttons">
+                <button id="done-btn" class="primary-btn">I Did This Workout</button>
+                <button id="regenerate-btn" class="secondary-btn">Give Me a Different One</button>
+            </div>
+        </section>
+
+        <!-- Exercise detail modal -->
+        <div id="exercise-modal" class="modal-overlay hidden">
+            <div class="modal">
+                <div class="modal-header">
+                    <div>
+                        <h3 id="modal-exercise-name"></h3>
+                        <span id="modal-muscle" class="modal-muscle"></span>
+                    </div>
+                    <button id="modal-close" class="modal-close">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <p class="modal-label">Form tip</p>
+                        <p id="modal-notes"></p>
+                    </div>
+                    <div class="modal-section">
+                        <p class="modal-label">Weight suggestion</p>
+                        <p id="modal-weight"></p>
+                    </div>
+                    <div class="modal-section">
+                        <p class="modal-label">Setup</p>
+                        <p id="modal-setup"></p>
+                    </div>
+                    <a id="modal-video-link" href="#" target="_blank" class="video-link">
+                        Watch demo clip ↗
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Logged confirmation -->
+        <section id="logged-confirmation" class="hidden">
+            <div class="confirmation">
+                <span class="checkmark">✓</span>
+                <h2>Session logged!</h2>
+                <p>Good work. Your next workout will build on this.</p>
+                <button id="new-session-btn" class="primary-btn">Start New Session</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

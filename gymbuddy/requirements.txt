@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+anthropic
+sqlite3
+python-dotenv
+jinja2
+python-multipart
