@@ -7,6 +7,92 @@ Automated SEO pipeline powered by Claude. Give it your website URL and it:
 4. Lets you review and approve items interactively
 5. Generates production-ready content for approved items
 
+## How it works
+
+```
+                         +------------------+
+         You run         |   main.py (CLI)  |
+         main.py  -----> | Collects inputs  |
+                         +--------+---------+
+                                  |
+               +------------------+------------------+
+               |                  |                  |
+               v                  v                  v
+    Stage 1: Performance   Stage 2: Keywords   (optional)
+    +-----------------+   +----------------+   Tone Analyzer
+    | Google Search   |   | SEMrush API    |   +-------------+
+    | Console (GSC)   |   |  - Organic KWs |   | Fetch ref   |
+    | + GA4 (optional)|   |  - KW Gap      |   | article URLs|
+    | Quick wins,     |   |  - Competitors |   | Claude      |
+    | top pages,      |   |  - KW Diff     |   | extracts    |
+    | traffic trends  |   | or Google KP   |   | tone profile|
+    +-----------------+   +----------------+   +------+------+
+               |                  |                   |
+               +--------+---------+                   |
+                        |                             |
+                        v                             |
+              Stage 3: Claude Analysis                |
+              +----------------------------+          |
+              | claude-opus-4-6            |          |
+              | Extended thinking          |          |
+              | Produces JSON report:      |          |
+              |  - Quick wins (pos 4-10)   |          |
+              |  - New content to create   |          |
+              |  - Pages to update         |          |
+              |  - Programmatic SEO        |          |
+              +-------------+--------------+          |
+                            |                         |
+                            v                         |
+                   Approval Gate (CLI)                |
+                   +-------------------+              |
+                   | Review each item  |              |
+                   | Select: all/none/ |              |
+                   | 1,3,5 / 1-4       |              |
+                   +--------+----------+              |
+                            |                         |
+                            v                         |
+              Stage 4: Content Generation <-----------+
+              +----------------------------+
+              | Format selector: picks     |
+              | ultimate_guide / how_to /  |
+              | listicle / comparison /    |
+              | problem_solution / faq_hub |
+              | / pillar_page              |
+              |                            |
+              | EEAT-style writing:        |
+              |  Experience examples       |
+              |  Expertise data points     |
+              |  Authoritative citations   |
+              |  Trust signals             |
+              |                            |
+              | Featured snippet bait      |
+              | PAA FAQ section            |
+              | Article + FAQPage schema   |
+              | Social snippets            |
+              | Internal link suggestions  |
+              |                            |
+              | Tone: from reference URLs  |
+              | (or HubSpot/Backlinko/     |
+              |  Ahrefs composite default) |
+              +----------------------------+
+                            |
+                            v
+                      outputs/
+                      ├── reports/      <- analysis + recommendations
+                      └── content/      <- articles, updates, templates
+```
+
+### Stage breakdown
+
+| Stage | What it does |
+|-------|-------------|
+| **Performance** | Queries GSC for clicks, impressions, CTR, positions (current vs previous period). Flags quick-win pages at positions 4–10. Optionally pulls GA4 organic traffic and top landing pages. |
+| **Keyword Research** | SEMrush: organic keyword rankings, competitor gap analysis, trending related terms, keyword difficulty scores, auto-competitor discovery. Fallback: Google Keyword Planner for volume and trend data. |
+| **Analysis Agent** | Claude (`claude-opus-4-6`) with adaptive thinking synthesises performance + keyword data into a structured recommendations report (JSON + human-readable Markdown). |
+| **Approval Gate** | Interactive CLI review of every recommendation. Supports `all`, `none`, range (`1-4`), and list (`1,3,5`) selection. Only approved items proceed to content generation. |
+| **Tone Analyzer** | (Optional) Fetches reference article URLs you provide, uses Claude to extract a tone profile (voice, sentence style, vocabulary, persona signals), then merges profiles into a composite. Injected into the content writer. |
+| **Content Generation** | Claude selects the best content format per item, then writes production-ready long-form content with EEAT signals, featured snippet bait, PAA section, JSON-LD schema, and social snippets. |
+
 ## Setup
 
 ### 1. Install dependencies
@@ -43,6 +129,7 @@ The pipeline will prompt you for:
 - GA4 property ID (optional)
 - Seed keywords for trend research
 - Competitor domains (SEMrush only, optional — auto-discovers if not provided)
+- Reference article URLs for tone matching (optional — paste URLs of top-performing blogs you want to emulate)
 
 ### CLI flags
 ```bash
@@ -54,6 +141,9 @@ python main.py --site https://example.com --no-semrush --seed-keywords "crm soft
 
 # With GA4
 python main.py --site https://example.com --ga4-property 123456789
+
+# With tone matching from reference articles
+python main.py --site https://example.com --reference-urls "https://blog1.com/article,https://blog2.com/article"
 
 # Re-run approval on an existing report (skip data collection)
 python main.py --skip-to-approval outputs/reports/2026-03-29_example.com_report.json --site https://example.com

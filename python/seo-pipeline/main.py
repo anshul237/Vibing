@@ -88,12 +88,20 @@ def _collect_inputs(args) -> dict:
         )
         competitor_domains = [c.strip() for c in comps_raw.split(",") if c.strip()]
 
+    # Tone matching — optional reference article URLs
+    ref_urls_raw = (
+        args.reference_urls
+        or _ask("  Reference article URLs for tone matching (optional, comma-separated, Enter to skip): ")
+    )
+    reference_urls = [u.strip() for u in ref_urls_raw.split(",") if u.strip()]
+
     return {
         "site_url": site_url,
         "use_semrush": use_semrush,
         "ga4_property": ga4_property or None,
         "seed_keywords": seed_keywords,
         "competitor_domains": competitor_domains or None,
+        "reference_urls": reference_urls,
     }
 
 
@@ -139,8 +147,15 @@ def run_pipeline(inputs: dict):
         print("  Pipeline stopped at approval gate.")
         return
 
+    # ── Tone Analysis (optional) ───────────────────────────────────────────────
+    tone_profile = {}
+    if inputs.get("reference_urls"):
+        from stages import tone_analyzer
+        print("\n  [INFO] Analysing tone from reference articles...")
+        tone_profile = tone_analyzer.run(inputs["reference_urls"])
+
     # ── Stage 4: Content Generation ────────────────────────────────────────────
-    content_agent.run(approved_items=approved, site_url=site_url)
+    content_agent.run(approved_items=approved, site_url=site_url, tone_profile=tone_profile)
 
 
 def main():
@@ -151,6 +166,7 @@ def main():
     parser.add_argument("--ga4-property", help="GA4 property ID")
     parser.add_argument("--seed-keywords", help="Comma-separated seed keywords")
     parser.add_argument("--competitors", help="Comma-separated competitor domains")
+    parser.add_argument("--reference-urls", help="Comma-separated reference article URLs for tone matching")
     parser.add_argument(
         "--skip-to-approval",
         metavar="REPORT_PATH",
